@@ -1,0 +1,5 @@
+/auth
+/data
+/.ipynb_checkpoints
+*.ipynb
+*.pdf
