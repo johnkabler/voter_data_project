@@ -54,10 +54,19 @@ def get_tweets(username):
 tweets_list = [{row[1][1]:get_tweets(row[1][0])} for row in vote_clean.iterrows()]
 # More to come.  Next step is to spit this out into CSV for crunching in
 # scikit.  My bet is that Naive Bayesian will work best for predictions.
+party_tweet_list = []
+for user in tweets_list:
+    for key in user:
+        for tweet in user[key]:
+            item = [tweet, key]
+            party_tweet_list.append(item)
 
-test_set = vote_raw[['tweet', 'party_affiliation']]
+# Write out the returned list object to a pandas dataframe, then
+# convert and write to csv.
 
-test_set.to_csv('tweets_party.csv')
+full_tweets = pd.DataFrame(party_tweet_list, columns=['tweet', 'party_affiliation'])
+full_tweets.to_csv('data/pulled_tweets.csv', encoding='utf8')
 
-
-vote_group = vote_raw[['party_affiliation', 'gender']].groupby(['party_affiliation','gender'])
+#This is now 18,000 plus Tweets with a party affiliation of the writer
+#attached.  Should be a great corpus for Naive Bayesian analysis
+#after N-gram vectorization.  
