@@ -1,24 +1,31 @@
 import numpy as np
 import pandas as pd
-tweets_party = pd.read_csv('data/makindo_data.csv')
+tweets_party = pd.read_csv('data/pulled_tweets_republican.csv')
 
 
-# from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+# from sklearn.feature_extraction.text import TfidfVectorizer
 
-vectorizer = TfidfVectorizer()
+import nltk.stem
+english_stemmer = nltk.stem.SnowballStemmer('english')
+class StemmedCountVectorizer(CountVectorizer):
+    def build_analyzer(self):
+        analyzer = super(StemmedCountVectorizer, self).build_analyzer()
+        return lambda doc: (english_stemmer.stem(w) for w in analyzer(doc))
 
-X = vectorizer.fit_transform(tweets_party.tweet)
+vectorizer = StemmedCountVectorizer(min_df=.1, stop_words='english',decode_error='ignore',
+                              ngram_range=(1,5))
+
+X = vectorizer.fit_transform(np.asarray(tweets_party.tweet, dtype="|S6"))
 #Random Forest requires a non-sparse matrix
-X = X.toarray()
+# X = X.toarray()
 # X = np.asarray(tweets_party.tweet, dtype="|S6")
-targets = np.asarray(tweets_party.party_affiliation, dtype="|S6")
-
-#Data is ready and vectorized.  Let's pull in random forest and use it for
-#classification
-from sklearn.ensemble import RandomForestClassifier
-
-classifier = RandomForestClassifier(n_estimators=20)
+# targets = np.asarray(tweets_party.party_affiliation, dtype="|S6")
+targets = np.asarray(tweets_party.is_republican)
+from sklearn.naive_bayes import MultinomialNB
+# from sklearn.svm import LinearSVC
+# classifier = LinearSVC()
+classifier = MultinomialNB()
 # ## Cross Validation Time
 
 from sklearn.cross_validation import KFold
@@ -46,4 +53,4 @@ print(score)
 # newly acquired sentiment corpus to train and then add a sentiment feature.
 
 # Also need to cleanse my newly acquired partisan tweets of emoticons to prevent
-# Numpy errors. 
+# Numpy errors.
