@@ -13,7 +13,7 @@ class StemmedCountVectorizer(CountVectorizer):
         analyzer = super(StemmedCountVectorizer, self).build_analyzer()
         return lambda doc: (english_stemmer.stem(w) for w in analyzer(doc))
 
-vectorizer = StemmedCountVectorizer(min_df=.1, stop_words='english',decode_error='ignore',
+vectorizer = StemmedCountVectorizer(min_df=1, stop_words='english',decode_error='ignore',
                               ngram_range=(1,5))
 
 X = vectorizer.fit_transform(np.asarray(tweets_party.tweet, dtype="|S6"))
