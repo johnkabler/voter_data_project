@@ -49,4 +49,6 @@ political_comments = comment_corpus[political]
 political_comments.to_pickle('data/reddit_poli_comments.pickle')
 
 #Let's also write out our raw comments corpus so we can try to write a political
-#comment filter.  
+#comment filter.
+
+comment_corpus.to_pickle('data/comment_corpus.pickle')
